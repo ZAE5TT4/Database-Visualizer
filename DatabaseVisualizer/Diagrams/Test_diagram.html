@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ER Diagram: Test.db</title>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        background: #d8d8d8;
+    }
+
+    #topbar {
+        height: 44px;
+        background: #1f2a44;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 14px;
+        box-sizing: border-box;
+        border-bottom: 2px solid #0e1530;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .topbar-title {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .topbar-controls {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        font-weight: normal;
+        white-space: nowrap;
+    }
+
+    .smooth-control {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .smooth-control input {
+        margin: 0;
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+    }
+
+    #exportPng {
+        border: 1px solid #ccd5ef;
+        background: #f5f7ff;
+        color: #14203d;
+        border-radius: 3px;
+        padding: 5px 10px;
+        font: inherit;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    #exportPng:hover {
+        background: #ffffff;
+    }
+
+    #canvas {
+        position: relative;
+        width: 100%;
+        height: calc(100% - 44px);
+        overflow: auto;
+        background: #cfcfcf;
+        background-image:
+            linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+        background-size: 24px 24px;
+    }
+
+    #workspace {
+        position: relative;
+        width: 1860px;
+        height: 1100px;
+    }
+
+    svg#lines {
+        position: absolute;
+        inset: 0;
+        width: 1860px;
+        height: 1100px;
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+    .table-box {
+        position: absolute;
+        width: 300px;
+        min-width: 220px;
+        min-height: 120px;
+        max-width: 900px;
+        background: #efefef;
+        border: 2px solid #666;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.18);
+        user-select: none;
+        resize: none;
+        overflow: visible;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .table-header {
+        background: #001f99;
+        color: #fff;
+        font-weight: bold;
+        padding: 7px 10px;
+        font-size: 16px;
+        border-bottom: 1px solid #00135f;
+        cursor: grab;
+        box-sizing: border-box;
+        width: 100%;
+        flex: 0 0 auto;
+    }
+
+    .table-header:active {
+        cursor: grabbing;
+    }
+    .table-content {
+        overflow: hidden;
+        padding: 0;
+        box-sizing: border-box;
+        flex: 1 1 auto;
+    }
+
+    .resize-bar {
+        position: relative;
+        flex: 0 0 16px;
+        height: 16px;
+        border-top: 1px solid #b4b4b4;
+        background: #e4e4e4;
+        box-sizing: border-box;
+    }
+
+    .resize-handle {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        right: 2px;
+        top: 1px;
+        cursor: nwse-resize;
+        z-index: 35;
+        border: 1px solid #555;
+        box-sizing: border-box;
+        background:
+            linear-gradient(135deg, transparent 35%, #666 35%, #666 45%, transparent 45%, transparent 55%, #666 55%, #666 65%, transparent 65%),
+            #ececec;
+    }
+
+    .row {
+        display: grid;
+        grid-template-columns: minmax(140px, 1.2fr) minmax(120px, 1fr) minmax(260px, 1.8fr);
+        align-items: center;
+        min-height: 26px;
+        border-top: 1px solid #b9b9b9;
+        background: #efefef;
+        position: relative;
+        font-size: 14px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .row:nth-child(even) {
+        background: #e5e5e5;
+    }
+
+    .col-name {
+        min-width: 0;
+        padding: 4px 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .col-type {
+        min-width: 0;
+        padding: 4px 6px;
+        border-left: 1px solid #c4c4c4;
+        color: #444;
+        font-size: 12px;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .col-def {
+        min-width: 0;
+        padding: 4px 8px;
+        border-left: 1px solid #c4c4c4;
+        color: #222;
+        font-size: 12px;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .anchor {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #ffda00;
+        border: 1px solid #333;
+        box-sizing: border-box;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+        pointer-events: none;
+    }
+    .anchor.left {
+        left: 0;
+        transform: translate(-50%, -50%);
+    }
+    .anchor.right {
+        right: 0;
+        transform: translate(50%, -50%);
+    }
+
+    .empty-note {
+        position: fixed;
+        left: 16px;
+        bottom: 16px;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid #888;
+        padding: 10px 12px;
+        font-size: 13px;
+        box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.12);
+        max-width: 420px;
+    }
+</style>
+</head>
+<body>
+    <div id="topbar">
+        <div class="topbar-title">Database Diagram: Test.db</div>
+        <div class="topbar-controls">
+            <label class="smooth-control" title="Use rounded connection corners">
+                <input id="smoothConnections" type="checkbox">
+                <span>Smooth connections</span>
+            </label>
+            <button id="exportPng" type="button">Export PNG</button>
+        </div>
+    </div>
+    <div id="canvas">
+        <div id="workspace">
+            <svg id="lines"></svg>
+        </div>
+    </div>
+    
+
+<script>
+const TABLES = [{"name": "categories", "x": 500, "y": 586, "width": 300, "columns": [{"cid": 0, "name": "id", "type": "INTEGER", "notnull": false, "default": null, "pk": true}, {"cid": 1, "name": "category_name", "type": "TEXT", "notnull": true, "default": null, "pk": false}]}, {"name": "order_items", "x": 500, "y": 70, "width": 300, "columns": [{"cid": 0, "name": "id", "type": "INTEGER", "notnull": false, "default": null, "pk": true}, {"cid": 1, "name": "order_id", "type": "INTEGER", "notnull": false, "default": null, "pk": false}, {"cid": 2, "name": "product_id", "type": "INTEGER", "notnull": false, "default": null, "pk": false}, {"cid": 3, "name": "quantity", "type": "INTEGER", "notnull": true, "default": null, "pk": false}, {"cid": 4, "name": "unit_price", "type": "REAL", "notnull": true, "default": null, "pk": false}]}, {"name": "orders", "x": 930, "y": 70, "width": 300, "columns": [{"cid": 0, "name": "id", "type": "INTEGER", "notnull": false, "default": null, "pk": true}, {"cid": 1, "name": "user_id", "type": "INTEGER", "notnull": false, "default": null, "pk": false}, {"cid": 2, "name": "order_date", "type": "TEXT", "notnull": true, "default": null, "pk": false}, {"cid": 3, "name": "status", "type": "TEXT", "notnull": true, "default": null, "pk": false}]}, {"name": "payments", "x": 1360, "y": 70, "width": 300, "columns": [{"cid": 0, "name": "id", "type": "INTEGER", "notnull": false, "default": null, "pk": true}, {"cid": 1, "name": "order_id", "type": "INTEGER", "notnull": false, "default": null, "pk": false}, {"cid": 2, "name": "amount", "type": "REAL", "notnull": true, "default": null, "pk": false}, {"cid": 3, "name": "payment_method", "type": "TEXT", "notnull": true, "default": null, "pk": false}, {"cid": 4, "name": "payment_status", "type": "TEXT", "notnull": true, "default": null, "pk": false}]}, {"name": "products", "x": 70, "y": 70, "width": 300, "columns": [{"cid": 0, "name": "id", "type": "INTEGER", "notnull": false, "default": null, "pk": true}, {"cid": 1, "name": "title", "type": "TEXT", "notnull": true, "default": null, "pk": false}, {"cid": 2, "name": "price", "type": "REAL", "notnull": true, "default": null, "pk": false}, {"cid": 3, "name": "stock_quantity", "type": "INTEGER", "notnull": true, "default": null, "pk": false}, {"cid": 4, "name": "category_id", "type": "INTEGER", "notnull": false, "default": null, "pk": false}]}, {"name": "reviews", "x": 500, "y": 328, "width": 300, "columns": [{"cid": 0, "name": "id", "type": "INTEGER", "notnull": false, "default": null, "pk": true}, {"cid": 1, "name": "product_id", "type": "INTEGER", "notnull": false, "default": null, "pk": false}, {"cid": 2, "name": "user_id", "type": "INTEGER", "notnull": false, "default": null, "pk": false}, {"cid": 3, "name": "rating", "type": "INTEGER", "notnull": false, "default": null, "pk": false}, {"cid": 4, "name": "comment", "type": "TEXT", "notnull": false, "default": null, "pk": false}]}, {"name": "roles", "x": 1360, "y": 328, "width": 300, "columns": [{"cid": 0, "name": "id", "type": "INTEGER", "notnull": false, "default": null, "pk": true}, {"cid": 1, "name": "role_name", "type": "TEXT", "notnull": true, "default": null, "pk": false}]}, {"name": "users", "x": 930, "y": 300, "width": 300, "columns": [{"cid": 0, "name": "id", "type": "INTEGER", "notnull": false, "default": null, "pk": true}, {"cid": 1, "name": "full_name", "type": "TEXT", "notnull": true, "default": null, "pk": false}, {"cid": 2, "name": "email", "type": "TEXT", "notnull": true, "default": null, "pk": false}, {"cid": 3, "name": "role_id", "type": "INTEGER", "notnull": false, "default": null, "pk": false}, {"cid": 4, "name": "created_at", "type": "TEXT", "notnull": true, "default": null, "pk": false}]}];
+const RELATIONS = [{"from_table": "order_items", "from_col": "product_id", "to_table": "products", "to_col": "id", "on_update": "NO ACTION", "on_delete": "CASCADE"}, {"from_table": "order_items", "from_col": "order_id", "to_table": "orders", "to_col": "id", "on_update": "NO ACTION", "on_delete": "CASCADE"}, {"from_table": "orders", "from_col": "user_id", "to_table": "users", "to_col": "id", "on_update": "NO ACTION", "on_delete": "CASCADE"}, {"from_table": "payments", "from_col": "order_id", "to_table": "orders", "to_col": "id", "on_update": "NO ACTION", "on_delete": "CASCADE"}, {"from_table": "products", "from_col": "category_id", "to_table": "categories", "to_col": "id", "on_update": "NO ACTION", "on_delete": "CASCADE"}, {"from_table": "reviews", "from_col": "user_id", "to_table": "users", "to_col": "id", "on_update": "NO ACTION", "on_delete": "CASCADE"}, {"from_table": "reviews", "from_col": "product_id", "to_table": "products", "to_col": "id", "on_update": "NO ACTION", "on_delete": "CASCADE"}, {"from_table": "users", "from_col": "role_id", "to_table": "roles", "to_col": "id", "on_update": "NO ACTION", "on_delete": "SET NULL"}];
+
+const workspace = document.getElementById("workspace");
+const svg = document.getElementById("lines");
+const smoothToggle = document.getElementById("smoothConnections");
+const exportPngButton = document.getElementById("exportPng");
+const DB_NAME = "Test.db";
+const resizeObserver = new ResizeObserver(() => drawRelations());
+
+function buildColumnDefinition(col) {
+    const parts = [];
+    parts.push(`"${col.name}"`);
+    if (col.type) parts.push(col.type);
+    if (col.notnull) parts.push("NOT NULL");
+    if (col.pk) parts.push("PRIMARY KEY");
+    if (col.default !== null && col.default !== undefined) {
+        parts.push("DEFAULT " + String(col.default));
+    }
+    return parts.join(" ");
+}
+
+function createTableBox(table) {
+    const box = document.createElement("div");
+    box.className = "table-box";
+    box.dataset.table = table.name;
+    box.style.left = table.x + "px";
+    box.style.top = table.y + "px";
+    box.style.width = (table.width || 300) + "px";
+
+    const header = document.createElement("div");
+    header.className = "table-header";
+    header.textContent = table.name;
+    box.appendChild(header);
+
+    const content = document.createElement("div");
+    content.className = "table-content";
+
+    table.columns.forEach(col => {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.dataset.col = col.name;
+        const name = document.createElement("div");
+        name.className = "col-name";
+        name.textContent = col.name;
+
+        const type = document.createElement("div");
+        type.className = "col-type";
+        type.textContent = col.type || "";
+
+        const def = document.createElement("div");
+        def.className = "col-def";
+        def.textContent = buildColumnDefinition(col);
+
+        const leftAnchor = document.createElement("div");
+        leftAnchor.className = "anchor left";
+
+        const rightAnchor = document.createElement("div");
+        rightAnchor.className = "anchor right";
+
+        row.appendChild(leftAnchor);
+        row.appendChild(name);
+        row.appendChild(type);
+        row.appendChild(def);
+        row.appendChild(rightAnchor);
+        content.appendChild(row);
+    });
+
+    box.appendChild(content);
+    workspace.appendChild(box);
+    makeDraggable(box, header);
+    makeResizable(box);
+    resizeObserver.observe(box);
+    content.addEventListener("scroll", drawRelations);
+}
+
+function getRowElement(tableName, colName) {
+    const table = document.querySelector(`.table-box[data-table="${CSS.escape(tableName)}"]`);
+    if (!table) return null;
+    return table.querySelector(`.row[data-col="${CSS.escape(colName)}"]`);
+}
+
+function getAnchorPoint(tableName, colName, side) {
+    const row = getRowElement(tableName, colName);
+    if (!row) return null;
+    const anchor = row.querySelector(".anchor." + side);
+    if (!anchor) return null;
+
+    const a = anchor.getBoundingClientRect();
+    const w = workspace.getBoundingClientRect();
+    return {
+        x: a.left - w.left + a.width / 2,
+        y: a.top - w.top + a.height / 2
+    };
+}
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+const ROUTE_MARGIN = 18;
+const ROUTE_BEND_PENALTY = 24;
+const ROUTE_EPS = 0.1;
+
+function getTableRect(tableName) {
+    const box = document.querySelector(`.table-box[data-table="${CSS.escape(tableName)}"]`);
+    if (!box) return null;
+    const r = box.getBoundingClientRect();
+    const w = workspace.getBoundingClientRect();
+    return {
+        name: tableName,
+        left: r.left - w.left,
+        right: r.right - w.left,
+        top: r.top - w.top,
+        bottom: r.bottom - w.top
+    };
+}
+
+function getRoutingObstacles() {
+    const w = workspace.getBoundingClientRect();
+    return Array.from(document.querySelectorAll(".table-box")).map(box => {
+        const r = box.getBoundingClientRect();
+        return {
+            name: box.dataset.table || "",
+            left: r.left - w.left - ROUTE_MARGIN,
+            right: r.right - w.left + ROUTE_MARGIN,
+            top: r.top - w.top - ROUTE_MARGIN,
+            bottom: r.bottom - w.top + ROUTE_MARGIN
+        };
+    });
+}
+
+function pointInsideObstacle(point, rect) {
+    return point.x > rect.left + ROUTE_EPS &&
+           point.x < rect.right - ROUTE_EPS &&
+           point.y > rect.top + ROUTE_EPS &&
+           point.y < rect.bottom - ROUTE_EPS;
+}
+
+function pointBlocked(point, obstacles) {
+    return obstacles.some(rect => pointInsideObstacle(point, rect));
+}
+
+function segmentClear(a, b, obstacles) {
+    if (Math.abs(a.x - b.x) < ROUTE_EPS) {
+        const x = a.x;
+        const y1 = Math.min(a.y, b.y);
+        const y2 = Math.max(a.y, b.y);
+        for (const rect of obstacles) {
+            if (x <= rect.left + ROUTE_EPS || x >= rect.right - ROUTE_EPS) continue;
+            if (Math.max(y1, rect.top) < Math.min(y2, rect.bottom) - ROUTE_EPS) return false;
+        }
+        return true;
+    }
+
+    if (Math.abs(a.y - b.y) < ROUTE_EPS) {
+        const y = a.y;
+        const x1 = Math.min(a.x, b.x);
+        const x2 = Math.max(a.x, b.x);
+        for (const rect of obstacles) {
+            if (y <= rect.top + ROUTE_EPS || y >= rect.bottom - ROUTE_EPS) continue;
+            if (Math.max(x1, rect.left) < Math.min(x2, rect.right) - ROUTE_EPS) return false;
+        }
+        return true;
+    }
+
+    return false;
+}
+
+function uniqueSorted(values) {
+    const sorted = [...values].sort((a, b) => a - b);
+    const result = [];
+    for (const value of sorted) {
+        if (!result.length || Math.abs(value - result[result.length - 1]) > 0.5) {
+            result.push(value);
+        }
+    }
+    return result;
+}
+
+class MinHeap {
+    constructor() {
+        this.items = [];
+    }
+
+    push(item) {
+        this.items.push(item);
+        let i = this.items.length - 1;
+        while (i > 0) {
+            const p = Math.floor((i - 1) / 2);
+            if (this.items[p].cost <= item.cost) break;
+            this.items[i] = this.items[p];
+            i = p;
+        }
+        this.items[i] = item;
+    }
+
+    pop() {
+        if (!this.items.length) return null;
+        const root = this.items[0];
+        const last = this.items.pop();
+        if (!this.items.length) return root;
+
+        let i = 0;
+        while (true) {
+            let left = i * 2 + 1;
+            let right = left + 1;
+            if (left >= this.items.length) break;
+            let child = left;
+            if (right < this.items.length && this.items[right].cost < this.items[left].cost) {
+                child = right;
+            }
+            if (this.items[child].cost >= last.cost) break;
+            this.items[i] = this.items[child];
+            i = child;
+        }
+        this.items[i] = last;
+        return root;
+    }
+
+    get length() {
+        return this.items.length;
+    }
+}
+
+function compressOrthogonalPoints(points) {
+    if (points.length <= 2) return points.slice();
+    const out = [points[0]];
+    for (let i = 1; i < points.length - 1; ++i) {
+        const a = out[out.length - 1];
+        const b = points[i];
+        const c = points[i + 1];
+        const vertical = Math.abs(a.x - b.x) < ROUTE_EPS && Math.abs(b.x - c.x) < ROUTE_EPS;
+        const horizontal = Math.abs(a.y - b.y) < ROUTE_EPS && Math.abs(b.y - c.y) < ROUTE_EPS;
+        if (!vertical && !horizontal) out.push(b);
+    }
+    out.push(points[points.length - 1]);
+    return out;
+}
+
+function routeOrthogonal(start, end, obstacles) {
+    const xs = [start.x, end.x];
+    const ys = [start.y, end.y];
+    for (const rect of obstacles) {
+        xs.push(rect.left, rect.right);
+        ys.push(rect.top, rect.bottom);
+    }
+
+    const xValues = uniqueSorted(xs);
+    const yValues = uniqueSorted(ys);
+    const nodes = [];
+    const nodeByGrid = new Map();
+
+    for (let ix = 0; ix < xValues.length; ++ix) {
+        for (let iy = 0; iy < yValues.length; ++iy) {
+            const point = {x: xValues[ix], y: yValues[iy]};
+            if (pointBlocked(point, obstacles)) continue;
+            const id = nodes.length;
+            nodes.push({id, ix, iy, x: point.x, y: point.y, edges: []});
+            nodeByGrid.set(`${ix}:${iy}`, id);
+        }
+    }
+
+    const startIx = xValues.findIndex(v => Math.abs(v - start.x) < 0.5);
+    const startIy = yValues.findIndex(v => Math.abs(v - start.y) < 0.5);
+    const endIx = xValues.findIndex(v => Math.abs(v - end.x) < 0.5);
+    const endIy = yValues.findIndex(v => Math.abs(v - end.y) < 0.5);
+    const startId = nodeByGrid.get(`${startIx}:${startIy}`);
+    const endId = nodeByGrid.get(`${endIx}:${endIy}`);
+    if (startId === undefined || endId === undefined) return null;
+
+    for (let ix = 0; ix < xValues.length; ++ix) {
+        let previousId = null;
+        for (let iy = 0; iy < yValues.length; ++iy) {
+            const id = nodeByGrid.get(`${ix}:${iy}`);
+            if (id === undefined) continue;
+            if (previousId !== null) {
+                const a = nodes[previousId];
+                const b = nodes[id];
+                if (segmentClear(a, b, obstacles)) {
+                    const len = Math.abs(a.y - b.y);
+                    a.edges.push({to: id, len, dir: 2});
+                    b.edges.push({to: previousId, len, dir: 2});
+                }
+            }
+            previousId = id;
+        }
+    }
+
+    for (let iy = 0; iy < yValues.length; ++iy) {
+        let previousId = null;
+        for (let ix = 0; ix < xValues.length; ++ix) {
+            const id = nodeByGrid.get(`${ix}:${iy}`);
+            if (id === undefined) continue;
+            if (previousId !== null) {
+                const a = nodes[previousId];
+                const b = nodes[id];
+                if (segmentClear(a, b, obstacles)) {
+                    const len = Math.abs(a.x - b.x);
+                    a.edges.push({to: id, len, dir: 1});
+                    b.edges.push({to: previousId, len, dir: 1});
+                }
+            }
+            previousId = id;
+        }
+    }
+
+    const stateCount = nodes.length * 3;
+    const dist = new Array(stateCount).fill(Infinity);
+    const parent = new Array(stateCount).fill(-1);
+    const heap = new MinHeap();
+    const startState = startId * 3;
+    dist[startState] = 0;
+    heap.push({state: startState, nodeId: startId, dir: 0, cost: 0});
+
+    while (heap.length) {
+        const current = heap.pop();
+        if (!current || current.cost !== dist[current.state]) continue;
+        const node = nodes[current.nodeId];
+        for (const edge of node.edges) {
+            const bend = current.dir !== 0 && current.dir !== edge.dir ? ROUTE_BEND_PENALTY : 0;
+            const nextCost = current.cost + edge.len + bend;
+            const nextState = edge.to * 3 + edge.dir;
+            if (nextCost + ROUTE_EPS < dist[nextState]) {
+                dist[nextState] = nextCost;
+                parent[nextState] = current.state;
+                heap.push({state: nextState, nodeId: edge.to, dir: edge.dir, cost: nextCost});
+            }
+        }
+    }
+
+    let bestState = -1;
+    let bestCost = Infinity;
+    for (let dir = 0; dir <= 2; ++dir) {
+        const state = endId * 3 + dir;
+        if (dist[state] < bestCost) {
+            bestCost = dist[state];
+            bestState = state;
+        }
+    }
+    if (bestState < 0 || !Number.isFinite(bestCost)) return null;
+
+    const reversed = [];
+    let state = bestState;
+    while (state >= 0) {
+        const nodeId = Math.floor(state / 3);
+        reversed.push({x: nodes[nodeId].x, y: nodes[nodeId].y});
+        if (state === startState) break;
+        state = parent[state];
+    }
+    reversed.reverse();
+    return {points: compressOrthogonalPoints(reversed), cost: bestCost};
+}
+
+function countBends(points) {
+    let bends = 0;
+    for (let i = 1; i < points.length - 1; ++i) {
+        const a = points[i - 1];
+        const b = points[i];
+        const c = points[i + 1];
+        const firstVertical = Math.abs(a.x - b.x) < ROUTE_EPS;
+        const secondVertical = Math.abs(b.x - c.x) < ROUTE_EPS;
+        if (firstVertical !== secondVertical) ++bends;
+    }
+    return bends;
+}
+
+function routeLength(points) {
+    let length = 0;
+    for (let i = 1; i < points.length; ++i) {
+        length += Math.abs(points[i].x - points[i - 1].x) + Math.abs(points[i].y - points[i - 1].y);
+    }
+    return length;
+}
+
+function relationRoute(rel, obstacles) {
+    const sidePairs = [
+        ["right", "left"],
+        ["left", "right"],
+        ["right", "right"],
+        ["left", "left"]
+    ];
+
+    let best = null;
+    for (const [startSide, endSide] of sidePairs) {
+        const startAnchor = getAnchorPoint(rel.from_table, rel.from_col, startSide);
+        const endAnchor = getAnchorPoint(rel.to_table, rel.to_col, endSide);
+        if (!startAnchor || !endAnchor) continue;
+
+        const startStub = {
+            x: startAnchor.x + (startSide === "right" ? ROUTE_MARGIN + 2 : -(ROUTE_MARGIN + 2)),
+            y: startAnchor.y
+        };
+        const endStub = {
+            x: endAnchor.x + (endSide === "right" ? ROUTE_MARGIN + 2 : -(ROUTE_MARGIN + 2)),
+            y: endAnchor.y
+        };
+
+        const routed = routeOrthogonal(startStub, endStub, obstacles);
+        if (!routed) continue;
+
+        let points = [startAnchor, ...routed.points, endAnchor];
+        points = compressOrthogonalPoints(points);
+        const score = routeLength(points) + countBends(points) * ROUTE_BEND_PENALTY;
+        if (!best || score < best.score) best = {points, score};
+    }
+
+    return best ? best.points : null;
+}
+
+function pathFromPoints(points, smooth) {
+    if (!points || points.length < 2) return "";
+    if (!smooth || points.length < 3) {
+        return points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+    }
+
+    let d = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 1; i < points.length - 1; ++i) {
+        const prev = points[i - 1];
+        const cur = points[i];
+        const next = points[i + 1];
+        const lenIn = Math.abs(cur.x - prev.x) + Math.abs(cur.y - prev.y);
+        const lenOut = Math.abs(next.x - cur.x) + Math.abs(next.y - cur.y);
+        const radius = Math.min(12, lenIn / 2, lenOut / 2);
+
+        const before = {
+            x: cur.x + (prev.x === cur.x ? 0 : Math.sign(prev.x - cur.x) * radius),
+            y: cur.y + (prev.y === cur.y ? 0 : Math.sign(prev.y - cur.y) * radius)
+        };
+        const after = {
+            x: cur.x + (next.x === cur.x ? 0 : Math.sign(next.x - cur.x) * radius),
+            y: cur.y + (next.y === cur.y ? 0 : Math.sign(next.y - cur.y) * radius)
+        };
+
+        d += ` L ${before.x} ${before.y} Q ${cur.x} ${cur.y} ${after.x} ${after.y}`;
+    }
+    const last = points[points.length - 1];
+    d += ` L ${last.x} ${last.y}`;
+    return d;
+}
+
+function appendRelationPath(points, smooth) {
+    const d = pathFromPoints(points, smooth);
+    if (!d) return;
+
+    const halo = document.createElementNS(SVG_NS, "path");
+    halo.setAttribute("d", d);
+    halo.setAttribute("fill", "none");
+    halo.setAttribute("stroke", "#f7f7f7");
+    halo.setAttribute("stroke-width", "6");
+    halo.setAttribute("stroke-linecap", "round");
+    halo.setAttribute("stroke-linejoin", "round");
+    halo.setAttribute("opacity", "0.95");
+
+    const path = document.createElementNS(SVG_NS, "path");
+    path.setAttribute("d", d);
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", "#222");
+    path.setAttribute("stroke-width", "2.4");
+    path.setAttribute("stroke-linecap", smooth ? "round" : "square");
+    path.setAttribute("stroke-linejoin", smooth ? "round" : "miter");
+
+    svg.appendChild(halo);
+    svg.appendChild(path);
+}
+
+function appendEndpoint(point, fill) {
+    const dot = document.createElementNS(SVG_NS, "circle");
+    dot.setAttribute("cx", point.x);
+    dot.setAttribute("cy", point.y);
+    dot.setAttribute("r", "3");
+    dot.setAttribute("fill", fill);
+    dot.setAttribute("stroke", "#222");
+    dot.setAttribute("stroke-width", "1.5");
+    svg.appendChild(dot);
+}
+
+function drawRelations() {
+    svg.innerHTML = "";
+    const obstacles = getRoutingObstacles();
+    const smooth = !!smoothToggle.checked;
+
+    RELATIONS.forEach(rel => {
+        const points = relationRoute(rel, obstacles);
+        if (!points || points.length < 2) return;
+        appendRelationPath(points, smooth);
+        appendEndpoint(points[0], "#fff");
+        appendEndpoint(points[points.length - 1], "#ffda00");
+    });
+}
+
+function getDiagramBounds() {
+    const w = workspace.getBoundingClientRect();
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    document.querySelectorAll(".table-box").forEach(box => {
+        const r = box.getBoundingClientRect();
+        minX = Math.min(minX, r.left - w.left);
+        minY = Math.min(minY, r.top - w.top);
+        maxX = Math.max(maxX, r.right - w.left);
+        maxY = Math.max(maxY, r.bottom - w.top);
+    });
+
+    try {
+        const b = svg.getBBox();
+        if (b.width > 0 || b.height > 0) {
+            minX = Math.min(minX, b.x);
+            minY = Math.min(minY, b.y);
+            maxX = Math.max(maxX, b.x + b.width);
+            maxY = Math.max(maxY, b.y + b.height);
+        }
+    } catch (_) {}
+
+    if (!Number.isFinite(minX)) {
+        return {x: 0, y: 0, width: workspace.scrollWidth, height: workspace.scrollHeight};
+    }
+
+    const padding = 24;
+    const x = Math.max(0, Math.floor(minX - padding));
+    const y = Math.max(0, Math.floor(minY - padding));
+    const right = Math.min(workspace.scrollWidth, Math.ceil(maxX + padding));
+    const bottom = Math.min(workspace.scrollHeight, Math.ceil(maxY + padding));
+    return {x, y, width: Math.max(1, right - x), height: Math.max(1, bottom - y)};
+}
+
+async function choosePngDestination(defaultName) {
+    if (typeof window.showSaveFilePicker !== "function") return null;
+    try {
+        return await window.showSaveFilePicker({
+            suggestedName: defaultName,
+            types: [{
+                description: "PNG image",
+                accept: {"image/png": [".png"]}
+            }]
+        });
+    } catch (error) {
+        if (error && error.name === "AbortError") return "cancelled";
+        throw error;
+    }
+}
+
+function drawClippedText(ctx, text, rect, font, color, paddingLeft = 8, align = "left") {
+    const x = rect.x;
+    const y = rect.y;
+    const w = rect.width;
+    const h = rect.height;
+    if (w <= 2 || h <= 2) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    ctx.clip();
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.textBaseline = "middle";
+    ctx.textAlign = align;
+    const tx = align === "right" ? x + w - paddingLeft : x + paddingLeft;
+    ctx.fillText(String(text || ""), tx, y + h / 2);
+    ctx.restore();
+}
+
+function relativeRect(element, workspaceRect) {
+    const r = element.getBoundingClientRect();
+    return {
+        x: r.left - workspaceRect.left,
+        y: r.top - workspaceRect.top,
+        width: r.width,
+        height: r.height
+    };
+}
+
+function drawSvgRelationsToCanvas(ctx) {
+    Array.from(svg.children).forEach(node => {
+        const tag = node.tagName.toLowerCase();
+        if (tag === "path") {
+            const d = node.getAttribute("d");
+            if (!d) return;
+            const p = new Path2D(d);
+            ctx.save();
+            ctx.strokeStyle = node.getAttribute("stroke") || "#222";
+            ctx.lineWidth = parseFloat(node.getAttribute("stroke-width") || "1");
+            ctx.globalAlpha = parseFloat(node.getAttribute("opacity") || "1");
+            ctx.lineCap = node.getAttribute("stroke-linecap") || "butt";
+            ctx.lineJoin = node.getAttribute("stroke-linejoin") || "miter";
+            ctx.stroke(p);
+            ctx.restore();
+        } else if (tag === "circle") {
+            const cx = parseFloat(node.getAttribute("cx") || "0");
+            const cy = parseFloat(node.getAttribute("cy") || "0");
+            const r = parseFloat(node.getAttribute("r") || "0");
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.fillStyle = node.getAttribute("fill") || "transparent";
+            ctx.fill();
+            ctx.strokeStyle = node.getAttribute("stroke") || "transparent";
+            ctx.lineWidth = parseFloat(node.getAttribute("stroke-width") || "1");
+            ctx.stroke();
+            ctx.restore();
+        }
+    });
+}
+
+function drawTablesToCanvas(ctx) {
+    const wr = workspace.getBoundingClientRect();
+
+    document.querySelectorAll(".table-box").forEach(box => {
+        const br = relativeRect(box, wr);
+
+        // Shadow and body.
+        ctx.save();
+        ctx.fillStyle = "rgba(0,0,0,0.18)";
+        ctx.fillRect(br.x + 3, br.y + 3, br.width, br.height);
+        ctx.fillStyle = "#efefef";
+        ctx.fillRect(br.x, br.y, br.width, br.height);
+        ctx.strokeStyle = "#666";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(br.x + 1, br.y + 1, Math.max(0, br.width - 2), Math.max(0, br.height - 2));
+        ctx.restore();
+
+        const header = box.querySelector(".table-header");
+        if (header) {
+            const hr = relativeRect(header, wr);
+            ctx.fillStyle = "#001f99";
+            ctx.fillRect(hr.x, hr.y, hr.width, hr.height);
+            ctx.strokeStyle = "#00135f";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(hr.x, hr.y + hr.height - 0.5);
+            ctx.lineTo(hr.x + hr.width, hr.y + hr.height - 0.5);
+            ctx.stroke();
+            drawClippedText(ctx, header.textContent, hr, "bold 16px Arial", "#fff", 10);
+        }
+
+        const content = box.querySelector(".table-content");
+        const contentRect = content ? relativeRect(content, wr) : br;
+
+        // The live HTML uses overflow:hidden on .table-content. Reproduce that
+        // clipping during Canvas export, otherwise wide grid cells that are hidden
+        // in the browser leak outside the table in the PNG.
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(contentRect.x, contentRect.y, contentRect.width, contentRect.height);
+        ctx.clip();
+
+        box.querySelectorAll(".row").forEach(row => {
+            const rr = relativeRect(row, wr);
+            const cs = getComputedStyle(row);
+            ctx.fillStyle = cs.backgroundColor || "#efefef";
+            ctx.fillRect(rr.x, rr.y, rr.width, rr.height);
+            ctx.strokeStyle = "#b9b9b9";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(rr.x, rr.y + 0.5);
+            ctx.lineTo(rr.x + rr.width, rr.y + 0.5);
+            ctx.stroke();
+
+            const name = row.querySelector(".col-name");
+            const type = row.querySelector(".col-type");
+            const def = row.querySelector(".col-def");
+            if (name) {
+                const r = relativeRect(name, wr);
+                drawClippedText(ctx, name.textContent, r, "14px Arial", "#000", 8);
+            }
+            if (type) {
+                const r = relativeRect(type, wr);
+                ctx.strokeStyle = "#c4c4c4";
+                ctx.beginPath();
+                ctx.moveTo(r.x + 0.5, r.y);
+                ctx.lineTo(r.x + 0.5, r.y + r.height);
+                ctx.stroke();
+                drawClippedText(ctx, type.textContent, r, "12px Arial", "#444", 6);
+            }
+            if (def) {
+                const r = relativeRect(def, wr);
+                ctx.strokeStyle = "#c4c4c4";
+                ctx.beginPath();
+                ctx.moveTo(r.x + 0.5, r.y);
+                ctx.lineTo(r.x + 0.5, r.y + r.height);
+                ctx.stroke();
+                drawClippedText(ctx, def.textContent, r, "12px Arial", "#222", 8);
+            }
+        });
+
+        // Anchors are children of .table-content in the live HTML, whose
+        // overflow:hidden clips the half that protrudes beyond the table edge.
+        // Draw them while the same content clipping region is active so PNG
+        // export matches the browser exactly.
+        box.querySelectorAll(".row .anchor").forEach(anchor => {
+            const ar = relativeRect(anchor, wr);
+            ctx.fillStyle = "#ffda00";
+            ctx.fillRect(ar.x, ar.y, ar.width, ar.height);
+            ctx.strokeStyle = "#333";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(ar.x + 0.5, ar.y + 0.5, Math.max(0, ar.width - 1), Math.max(0, ar.height - 1));
+        });
+
+        ctx.restore();
+
+        const bar = box.querySelector(".resize-bar");
+        if (bar) {
+            const r = relativeRect(bar, wr);
+            ctx.fillStyle = "#e4e4e4";
+            ctx.fillRect(r.x, r.y, r.width, r.height);
+            ctx.strokeStyle = "#b4b4b4";
+            ctx.beginPath();
+            ctx.moveTo(r.x, r.y + 0.5);
+            ctx.lineTo(r.x + r.width, r.y + 0.5);
+            ctx.stroke();
+        }
+    });
+}
+
+function renderDiagramToCanvas(bounds, scale = 2) {
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bounds.width * scale));
+    canvas.height = Math.max(1, Math.round(bounds.height * scale));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas is not available in this browser.");
+
+    // Intentionally do not fill the canvas: PNG background stays transparent.
+    ctx.scale(scale, scale);
+    ctx.translate(-bounds.x, -bounds.y);
+    drawSvgRelationsToCanvas(ctx);
+    drawTablesToCanvas(ctx);
+    return canvas;
+}
+
+async function exportDiagramPng() {
+    const baseName = (DB_NAME.replace(/\.[^.]+$/, "") || "diagram").replace(/[^a-zA-Z0-9_\-а-яА-ЯёЁ]+/g, "_");
+    const fileName = baseName + "_diagram.png";
+
+    let fileHandle = null;
+    try {
+        // Ask for the destination first while the click still has user activation.
+        fileHandle = await choosePngDestination(fileName);
+        if (fileHandle === "cancelled") return;
+
+        drawRelations();
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        const bounds = getDiagramBounds();
+        const canvas = renderDiagramToCanvas(bounds, 2);
+        const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+        if (!pngBlob) throw new Error("Failed to create the PNG image.");
+
+        if (fileHandle) {
+            const writable = await fileHandle.createWritable();
+            await writable.write(pngBlob);
+            await writable.close();
+            return;
+        }
+
+        // Fallback for browsers without the File System Access API.
+        const pngUrl = URL.createObjectURL(pngBlob);
+        try {
+            const link = document.createElement("a");
+            link.href = pngUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } finally {
+            setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
+        }
+    } catch (error) {
+        if (error && error.name === "AbortError") return;
+        const message = error && error.message ? error.message : "Failed to export the diagram as PNG.";
+        alert("PNG export failed: " + message);
+    }
+}
+
+function makeResizable(target) {
+    const bar = document.createElement("div");
+    bar.className = "resize-bar";
+
+    const handle = document.createElement("div");
+    handle.className = "resize-handle";
+    bar.appendChild(handle);
+    target.appendChild(bar);
+
+    const header = target.querySelector(".table-header");
+    const content = target.querySelector(".table-content");
+
+    let resizing = false;
+    let startX = 0;
+    let startY = 0;
+    let startW = 0;
+    let startH = 0;    function calcMinHeight() {
+        const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+        const barH = Math.ceil(bar.getBoundingClientRect().height || 16);
+        const contentH = content ? Math.ceil(content.scrollHeight) : 0;
+        return headerH + barH + contentH + 4;
+    }
+
+    const baseMinHeight = calcMinHeight();
+    target.style.minHeight = baseMinHeight + "px";
+
+    handle.addEventListener("mousedown", (e) => {
+        const rect = target.getBoundingClientRect();
+        resizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startW = rect.width;
+        startH = rect.height;
+        document.body.style.cursor = "nwse-resize";
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    document.addEventListener("mousemove", (e) => {
+        if (!resizing) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        const nextW = Math.max(220, Math.min(1200, Math.round(startW + dx)));
+        const nextH = Math.max(baseMinHeight, Math.min(1200, Math.round(startH + dy)));
+        target.style.width = nextW + "px";
+        target.style.height = nextH + "px";
+        drawRelations();
+    });
+
+    document.addEventListener("mouseup", () => {
+        if (!resizing) return;
+        resizing = false;
+        document.body.style.cursor = "";
+        drawRelations();
+    });
+}
+
+function makeDraggable(target, handle) {
+    let dragging = false;
+    let startX = 0;
+    let startY = 0;
+    let boxX = 0;
+    let boxY = 0;
+
+    handle.addEventListener("mousedown", (e) => {
+        dragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        boxX = parseInt(target.style.left, 10) || 0;
+        boxY = parseInt(target.style.top, 10) || 0;
+        document.body.style.cursor = "grabbing";
+        e.preventDefault();
+    });
+
+    document.addEventListener("mousemove", (e) => {
+        if (!dragging) return;
+        target.style.left = (boxX + (e.clientX - startX)) + "px";
+        target.style.top = (boxY + (e.clientY - startY)) + "px";
+        drawRelations();
+    });
+
+    document.addEventListener("mouseup", () => {
+        dragging = false;
+        document.body.style.cursor = "";
+    });
+}
+
+TABLES.forEach(createTableBox);
+smoothToggle.addEventListener("change", drawRelations);
+exportPngButton.addEventListener("click", exportDiagramPng);
+setTimeout(drawRelations, 80);
+window.addEventListener("resize", drawRelations);
+</script>
+</body>
+</html>
